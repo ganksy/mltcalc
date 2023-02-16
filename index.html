@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>VDSL Metallic Line Test Checker</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    label {
+      margin-bottom: 10px;
+    }
+    input {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 24px;
+    }
+    #dark-mode-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      cursor: pointer;
+    }
+    .dark-mode #dark-mode-toggle {
+      color: #fff;
+    }
+    .dark-mode {
+      background-color: #333;
+      color: #fff;
+    }
+    .dark-mode .result {
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>VDSL Metallic Line Test Checker</h1>
+    <form id="mlt-form">
+      <label>Resistance of A wire to ground (kohms): <input type="number" id="resistance-a" /></label><br>
+      <label>Resistance of B wire to ground (kohms): <input type="number" id="resistance-b" /></label><br>
+      <label>Capacitance of A wire (microfarads): <input type="number" id="capacitance-a" step="0.01" /></label><br>
+      <label>Capacitance of B wire (microfarads): <input type="number" id="capacitance-b" step="0.01" /></label><br>
+      <label>Insulation resistance between A and B wires (kohms): <input type="number" id="insulation" /></label><br>
+      <button type="submit">Check MLT results</button>
+    </form>
+    <div id="result"></div>
+  </div>
+  <div id="dark-mode-toggle">Toggle dark mode</div>
+  <script>
+    // Get the form element
+    const form = document.getElementById('mlt-form');
+
+    // Function to check if the MLT line is in specification
+    function checkMLT(resistanceA, resistanceB, capacitanceA, capacitanceB, insulation) {
+      // Calculate the capacitance balance
+      const capacitanceBalance = Math.min(capacitanceA, capacitanceB) / Math.max(capacitanceA, capacitanceB) * 100;
+
+      if (resistanceA !== "" && resistanceA < 1800) {
+        return "Resistance of A wire to ground is too low";
+      } else if (resistanceB !== "" && resistanceB < 1800) {
+        return "Resistance of B wire to ground is too low";
+      } else if (insulation !== "" && insulation < 600) {
+        return "Insulation resistance between A and B wires is too low";
+      } else if (capacitanceA !== "" && capacitanceB !== "" && capacitanceBalance < 90) {
+        return "Capacitance balance is too low";
+      } else {
+        return "In specification";
+      }
+    }
+
+    // Handle the form submission
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      // Get the user's input
+      const resistanceA = document.getElementById('resistance-a').value;
+      const resistanceB = document.getElementById('resistance-b').value;
+      const capacitanceA = document.getElementById('capacitance-a').value;
+      const capacitanceB = document.getElementById('capacitance-b').value;
+      const insulation = document.getElementById('insulation').value;
+
+      // Calculate the capacitance balance
+      const capacitanceBalance = Math.min(capacitanceA, capacitanceB) / Math.max(capacitanceA, capacitanceB) * 100;
+
+      // Check if the MLT line is in specification
+      const result = checkMLT(resistanceA, resistanceB, capacitanceA, capacitanceB, insulation);
+
+      // Display the result and capacitance balance to the user
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = `Result: ${result}<br>Capacitance balance: ${capacitanceBalance.toFixed(2)}%`;
+    });
+
+    // Handle the dark mode toggle
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    darkModeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+    });
+  </script>
+</body>
+</html>
